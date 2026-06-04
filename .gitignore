@@ -1,0 +1,59 @@
+# .gitignore para proyecto PHP / web
+# Excluir dependencias, caches, archivos temporales, IDEs y archivos de sistema
+
+### Composer / PHP
+/vendor/
+composer.phar
+
+### Node / frontend
+/node_modules/
+/dist/
+/build/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+### Logs, caches y bases de datos
+*.log
+*.cache
+coverage/
+cache/
+var/
+tmp/
+/tmp/
+*.sql
+*.sqlite
+
+### Aplicación: directorios de subida/medios/exports
+/media/
+/export/
+/viewers/
+/assets/
+
+### Directorios específicos de la estructura del repo
+/app/tmp/
+/app/log/
+
+### Configuración local / secrets
+.env
+.env.*
+DOCKER_ENV
+
+### IDEs / editores
+.idea/
+.vscode/
+*.sublime-project
+*.sublime-workspace
+
+### S.O. y archivos temporales
+.DS_Store
+Thumbs.db
+desktop.ini
+ehthumbs.db
+*.swp
+*.bak
+*.tmp
+
+### Otros
+*.iml
+/.phpunit.result.cache
