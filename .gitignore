@@ -57,3 +57,6 @@ ehthumbs.db
 ### Otros
 *.iml
 /.phpunit.result.cache
+
+# Excluir composer.lock para permitir que cada desarrollador tenga su propia versión de dependencias
+composer.lock
