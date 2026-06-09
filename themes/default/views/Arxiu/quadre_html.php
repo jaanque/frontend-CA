@@ -1,6 +1,6 @@
 <?php
 /** ---------------------------------------------------------------------
- * themes/default/views/Arxiu/quadre_html.php : Acordió Sencill i Nadiu
+ * themes/default/views/Arxiu/quadre_html.php : Acordió Jeràrquic (Tree-view)
  * ----------------------------------------------------------------------
  */
 ?>
@@ -66,14 +66,16 @@
                 $classe_contenidor = ($nivell == 0) ? 'ahat-carpeta-arrel' : 'ahat-subcarpeta';
                 
                 if (($num_documents == 0 && !$has_children) || $es_privada) {
+                    $icona_motiu = $es_privada ? "glyphicon-lock" : "glyphicon-ban-circle";
                     $motiu = $es_privada ? "Privat" : "Buida";
                     echo '
                     <div class="'.$classe_contenidor.' ahat-carpeta-buida">
                         <div class="ahat-info-esquerra">
-                            📁 <span>'.$vs_collection_name.'</span>
+                            <span class="glyphicon glyphicon-folder-close ahat-icona-carpeta"></span> 
+                            <span>'.$vs_collection_name.'</span>
                         </div>
                         <div class="ahat-info-dreta">
-                            <span class="ahat-badge">🚫 '.$motiu.'</span>
+                            <span class="ahat-badge"><span class="glyphicon '.$icona_motiu.'"></span> '.$motiu.'</span>
                         </div>
                     </div>';
                 } 
@@ -82,9 +84,10 @@
                     <details class="'.$classe_contenidor.'">
                         <summary class="ahat-carpeta-capcalera">
                             <div class="ahat-info-esquerra">
-                                📂 <span>'.$vs_collection_name.'</span>
+                                <span class="glyphicon glyphicon-folder-open ahat-icona-carpeta"></span> 
+                                <span>'.$vs_collection_name.'</span>
                             </div>
-                            <div class="ahat-fletxa">▼</div>
+                            <div class="ahat-fletxa"><span class="glyphicon glyphicon-chevron-down"></span></div>
                         </summary>
                         
                         <div class="ahat-carpeta-contingut">';
@@ -98,28 +101,25 @@
                             echo '</div>';
                         }
 
-                        // IMATGES
+                        // DOCUMENTS (Llistat amb icona real)
                         if ($num_documents > 0) {
-                            echo '<div class="ahat-graella">';
+                            echo '<ul class="ahat-doc-llista">';
                             foreach($va_objects as $va_obj) {
                                 $vn_object_id = $va_obj['object_id'];
                                 $t_object = new ca_objects($vn_object_id);
                                 $vs_title = $t_object->get('ca_objects.preferred_labels');
-                                $vs_image_tag = $t_object->get('ca_object_representations.media.small'); 
                                 
                                 $vs_link = caNavUrl($request, '', 'Detail', 'objects', array($vn_object_id));
                                 
                                 echo '
-                                <a href="'.$vs_link.'" class="ahat-doc-targeta">
-                                    <div class="ahat-doc-imatge">';
-                                    if($vs_image_tag) { echo $vs_image_tag; } 
-                                    else { echo '<div class="no-img">📄 Sense imatge</div>'; }
-                                echo '
-                                    </div>
-                                    <div class="ahat-doc-titol">'.$vs_title.'</div>
-                                </a>';
+                                <li class="ahat-doc-item">
+                                    <a href="'.$vs_link.'">
+                                        <span class="glyphicon glyphicon-picture ahat-icona-doc"></span> 
+                                        '.$vs_title.'
+                                    </a>
+                                </li>';
                             }
-                            echo '</div>';
+                            echo '</ul>';
                         }
                             
                     echo '
@@ -140,7 +140,7 @@
 </div>
 
 <style>
-    /* Estructura general sin forzar fuentes */
+    /* Estructura general */
     .ahat-arxiu-wrapper { 
         max-width: 1000px; 
         margin: 40px auto; 
@@ -155,29 +155,40 @@
     .ahat-carpetes-container { 
         display: flex; 
         flex-direction: column; 
-        gap: 10px; 
+        gap: 15px; 
     }
     
-    /* --- NIVELL 0 y SUBCARPETAS (Bordes simples) --- */
+    /* --- NIVELL 0 (La carpeta principal parece una caja solida) --- */
     .ahat-carpeta-arrel { 
         background: #fff; 
-        border: 1px solid #ccc; 
+        border: 1px solid #dcdcdc; 
+        border-radius: 4px;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.05);
     }
     
+    /* --- SUBCARPETAS (Efecto árbol jerárquico, sin cajas pesadas) --- */
     .ahat-subcarpetes-wrapper {
         display: flex; 
         flex-direction: column; 
-        gap: 5px; 
-        margin-bottom: 15px;
+        gap: 8px; 
+        margin: 10px 0 10px 15px;
+        padding-left: 15px;
+        border-left: 2px solid #eaeaea; /* Línea guía visual */
     }
     
     .ahat-subcarpeta { 
-        background: #fff; 
-        border: 1px solid #e0e0e0; 
-        margin-left: 20px; /* Tabulación normal */
+        background: transparent; 
+        border: none; 
+    }
+    
+    /* Le damos borde solo a la cabecera de la subcarpeta para que resalte ligeramente */
+    .ahat-subcarpeta > .ahat-carpeta-capcalera {
+        border: 1px solid #e8e8e8;
+        border-radius: 4px;
+        background: #fafafa;
     }
 
-    /* --- CAPÇALERES (Simples y nativas) --- */
+    /* --- CAPÇALERES --- */
     .ahat-carpeta-capcalera { 
         display: flex; 
         justify-content: space-between; 
@@ -186,12 +197,13 @@
         cursor: pointer; 
         list-style: none; 
         user-select: none; 
+        transition: background-color 0.2s;
     }
     
     .ahat-carpeta-capcalera::-webkit-details-marker { display: none; }
     
     .ahat-carpeta-capcalera:hover { 
-        background: #f5f5f5; 
+        background: #f1f1f1 !important; 
     }
 
     .ahat-carpeta-buida { 
@@ -199,27 +211,45 @@
         justify-content: space-between; 
         align-items: center;
         padding: 12px 15px; 
-        background: #fafafa; 
+        background: #fdfdfd; 
         color: #888; 
-        border-color: #eee;
+    }
+    
+    /* Borde inferior solo para carpetas principales abiertas */
+    .ahat-carpeta-arrel[open] > .ahat-carpeta-capcalera { 
+        border-bottom: 1px solid #eee; 
     }
 
     .ahat-info-esquerra { 
         display: flex; 
         align-items: center; 
-        gap: 10px; 
+        font-weight: 500;
+        color: #333;
     }
     
+    /* Estilos para los iconos */
+    .ahat-icona-carpeta {
+        color: #6c757d;
+        margin-right: 12px;
+        font-size: 1.2em;
+    }
+
+    .ahat-icona-doc {
+        color: #adb5bd;
+        margin-right: 10px;
+    }
+
     .ahat-badge { 
-        font-size: 0.85em; /* Tamaño relativo al texto estándar */
-        background: #eee; 
-        padding: 2px 8px; 
-        border-radius: 4px; 
-        color: #555; 
+        font-size: 0.85em; 
+        background: #f5f5f5; 
+        padding: 4px 10px; 
+        border-radius: 20px; 
+        color: #777; 
+        border: 1px solid #e0e0e0;
     }
     
     .ahat-fletxa { 
-        color: #888; 
+        color: #aaa; 
         font-size: 0.8em; 
         transition: transform 0.2s ease; 
     }
@@ -227,60 +257,42 @@
     details[open] > .ahat-carpeta-capcalera > .ahat-fletxa { 
         transform: rotate(180deg); 
     }
-    
-    details[open] > .ahat-carpeta-capcalera { 
-        border-bottom: 1px solid #eee; 
-        background: #fdfdfd; 
-    }
 
     /* --- CONTINGUT INTERIOR --- */
     .ahat-carpeta-contingut { 
-        padding: 15px; 
+        padding: 10px 15px; 
     }
 
-    .ahat-graella { 
-        display: flex; 
-        flex-wrap: wrap; 
-        gap: 15px; 
+    /* --- LLISTAT DE DOCUMENTS --- */
+    .ahat-doc-llista { 
+        list-style-type: none;
+        padding-left: 15px;
+        margin: 5px 0 5px 15px;
+        display: flex;
+        flex-direction: column;
+        border-left: 2px solid #eaeaea; /* Línea guía visual para documentos también */
     }
 
-    /* --- TARGETES DE DOCUMENTS (Estilo plano) --- */
-    .ahat-doc-targeta { 
-        width: 130px; 
-        background: #fff;
-        border: 1px solid #ddd; 
-        text-decoration: none; 
-        color: inherit; /* Hereda el color de enlace por defecto */
+    .ahat-doc-item a { 
         display: block;
+        padding: 10px 14px;
+        color: #444;
+        text-decoration: none;
+        border-bottom: 1px solid #f0f0f0; /* Separador sutil, no caja */
+        transition: all 0.2s ease;
     }
     
-    .ahat-doc-targeta:hover { 
-        border-color: #999; /* Oscurece la línea sin sombras ni movimientos */
+    /* Quitar el borde inferior del último documento para que quede más limpio */
+    .ahat-doc-item:last-child a {
+        border-bottom: none;
+    }
+
+    .ahat-doc-item a:hover { 
+        background-color: #f9f9f9;
+        color: #000;
     }
     
-    .ahat-doc-imatge { 
-        height: 120px; 
-        background: #f5f5f5; 
-        display: flex; 
-        align-items: center; 
-        justify-content: center; 
-        overflow: hidden; 
-        border-bottom: 1px solid #eee;
-    }
-    
-    .ahat-doc-imatge img { 
-        width: 100%; 
-        height: 100%; 
-        object-fit: cover; 
-    }
-    
-    .no-img { 
-        color: #aaa; 
-        font-size: 0.85em; 
-    }
-    
-    .ahat-doc-titol { 
-        padding: 8px; 
-        line-height: 1.3; 
+    .ahat-doc-item a:hover .ahat-icona-doc {
+        color: #555;
     }
 </style>
