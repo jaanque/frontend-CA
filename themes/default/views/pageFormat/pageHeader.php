@@ -86,9 +86,6 @@ $has_user_links = (sizeof($user_links) > 0);
                     <span class="icon-bar"></span>
                     <span class="icon-bar"></span>
                 </button>
-<?php
-                print caNavLink($this->request, caGetMenuBarLogo(), "navbar-brand", "", "","");
-?>
             </div>
 
         <?php
@@ -110,8 +107,7 @@ $has_user_links = (sizeof($user_links) > 0);
                     <li class="dropdown" style="position:relative;">
                         <a href="#" class="dropdown-toggle icon" data-toggle="dropdown"><span class="glyphicon glyphicon-user" aria-label="<?= _t("User options"); ?>"></span></a>
                         <ul class="dropdown-menu" role="list"><?= join("\n", $user_links); ?></ul>
-                    </li>
-                </ul>
+                    </li> </ul>
 <?php
     }
 ?>

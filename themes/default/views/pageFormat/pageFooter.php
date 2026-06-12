@@ -27,7 +27,54 @@
  */
 ?>
         <div style="clear:both; height:1px;"></div>
-        </div></div></div></div></div><footer id="footer" role="contentinfo">
+        </div></div></div></div></div>
+
+        <style>
+            #footer {
+                background-color: #ffffff; /* Fondo blanco limpio */
+                border-top: 1px solid #e9ecef; /* Línea de división ultra sutil */
+                padding: 40px 0;
+                margin-top: 50px;
+                font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            }
+            
+            #footer .container {
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+
+            #footer .list-inline {
+                margin: 0;
+                padding: 0;
+                display: inline-flex;
+                gap: 12px; /* Espaciado moderno entre elementos */
+            }
+
+            #footer .list-inline li {
+                padding: 0 !important;
+                margin: 0 !important;
+            }
+
+            #footer .list-inline a {
+                color: #767676; /* Gris neutro de texto secundario tipo Pinterest */
+                font-weight: 600;
+                font-size: 14px;
+                text-decoration: none !important;
+                padding: 10px 20px;
+                border-radius: 30px; /* Botón tipo píldora */
+                transition: all 0.2s ease;
+                display: inline-block;
+            }
+
+            /* Efecto Hover suave al pasar el ratón */
+            #footer .list-inline a:hover {
+                background-color: #f1f3f5; /* Fondo gris claro suave */
+                color: #111111; /* Texto casi negro */
+            }
+        </style>
+
+        <footer id="footer" role="contentinfo">
             <div class="container text-center">
                 <ul class="list-inline">
                     <li>
@@ -38,12 +85,18 @@
                     </li>
                     <?php if (CookieOptionsManager::cookieManagerEnabled()): ?>
                         <li>
-                            <?php print caNavLink($this->request, "Gestió de Cookies", "", "", "Cookies", "manage"); ?>
+                            <?php 
+                                // Capturamos el enlace nativo de cookies para aplicarle el estilo limpio
+                                $cookieLink = caNavLink($this->request, "Gestió de Cookies", "", "", "Cookies", "manage");
+                                // Le inyectamos la clase si es necesario, aunque al heredar de la lista ya toma el estilo
+                                print $cookieLink; 
+                            ?>
                         </li>
                     <?php endif; ?>
                 </ul>
             </div>
         </footer>
+
         <?php print TooltipManager::getLoadHTML(); ?>
         
         <div id="caMediaPanel" role="complementary"> 
