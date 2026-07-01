@@ -1,12 +1,12 @@
 <?php
 /** ---------------------------------------------------------------------
  * themes/default/views/Arxiu/quadre_html.php : Acordió Jeràrquic (Tree-view)
+ * UI/UX Mejorada
  * ----------------------------------------------------------------------
  */
 ?>
 
 <div class="ahat-arxiu-wrapper">
-    
     <div class="ahat-arxiu-header">
         <h1>Quadre de Classificació</h1>
     </div>
@@ -63,7 +63,7 @@
                 
                 $has_children = isset($tree[$vn_collection_id]) && count($tree[$vn_collection_id]) > 0;
                 
-                // Identificar si es un directorio principal (Nivel 0) para separarlo visualmente
+                // Identificar si es un directorio principal (Nivel 0)
                 $classe_arrel = ($nivell == 0) ? 'ahat-directori-arrel' : '';
 
                 // Elemento sin contenido o privado
@@ -71,23 +71,24 @@
                     $icona = $es_privada ? "glyphicon-lock" : "glyphicon-folder-close";
                     $motiu = $es_privada ? "Privat" : "Buida";
                     $color = $es_privada ? "ahat-color-privat" : "ahat-color-buit";
+                    $badge_class = $es_privada ? "ahat-badge-danger" : "ahat-badge-muted";
 
                     echo '
                     <div class="ahat-tree-row ahat-disabled '.$classe_arrel.'">
                         <span class="ahat-caret-placeholder"></span>
                         <span class="glyphicon '.$icona.' ahat-icon '.$color.'"></span> 
                         <span class="ahat-label">'.$vs_collection_name.'</span>
-                        <span class="ahat-tag">'.$motiu.'</span>
+                        <span class="ahat-tag '.$badge_class.'">'.$motiu.'</span>
                     </div>';
                 } 
                 // Carpeta con contenido
                 else {
-                    $badge_docs = $num_documents > 0 ? '<span class="ahat-tag">'.$num_documents.' docs</span>' : '';
+                    $badge_docs = $num_documents > 0 ? '<span class="ahat-tag ahat-badge-info">'.$num_documents.' docs</span>' : '';
 
                     echo '
                     <details class="ahat-tree-node '.$classe_arrel.'">
                         <summary class="ahat-tree-row">
-                            <span class="glyphicon glyphicon-triangle-right ahat-caret"></span>
+                            <span class="glyphicon glyphicon-chevron-right ahat-caret"></span>
                             <span class="glyphicon glyphicon-folder-close ahat-icon ahat-color-carpeta ahat-icon-tancada"></span>
                             <span class="glyphicon glyphicon-folder-open ahat-icon ahat-color-carpeta ahat-icon-oberta"></span>
                             <span class="ahat-label font-weight-bold">'.$vs_collection_name.'</span>
@@ -133,73 +134,94 @@
                 }
                 echo '</div>';
             } else {
-                echo '<p class="text-muted">No hi ha directoris públics.</p>';
+                echo '<div class="ahat-empty-state"><span class="glyphicon glyphicon-inbox"></span><p>No hi ha directoris públics.</p></div>';
             }
         ?>
     </div>
 </div>
 
 <style>
+    :root {
+        --text-main: #2c3e50;
+        --text-muted: #7f8c8d;
+        --border-color: #eaeaea;
+        --bg-main: #ffffff;
+        --bg-hover: #f4f6f8;
+        --bg-root: #fdfdfd;
+        --color-folder: #f39c12;
+        --color-doc: #95a5a6;
+        --color-private: #e74c3c;
+        --color-empty: #bdc3c7;
+        --transition-speed: 0.2s;
+    }
+
     /* Estructura general */
     .ahat-arxiu-wrapper { 
         max-width: 900px; 
-        margin: 20px auto; 
-        font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
-        font-size: 14px;
-        color: #333;
+        margin: 30px auto; 
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+        font-size: 15px;
+        color: var(--text-main);
+        background: var(--bg-main);
+        border-radius: 12px;
+        box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+        padding: 24px;
+        border: 1px solid var(--border-color);
     }
     
     .ahat-arxiu-header h1 { 
-        font-size: 22px; 
-        border-bottom: 2px solid #ddd; 
-        padding-bottom: 8px; 
-        margin-bottom: 15px; 
+        font-size: 24px; 
+        font-weight: 600;
+        border-bottom: 2px solid var(--border-color); 
+        padding-bottom: 12px; 
+        margin-top: 0;
+        margin-bottom: 20px; 
+        color: #1a252f;
     }
 
     .ahat-root-wrapper {
-        border: 1px solid #e0e0e0;
-        border-radius: 4px;
-        background: #fff;
+        border-radius: 8px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
     }
 
     /* --- SEPARACIÓN DE DIRECTORIOS PRINCIPALES --- */
     .ahat-directori-arrel {
-        border-bottom: 1px solid #eaeaea; /* Línea separadora clara */
-        background-color: #fafafa; /* Fondo ligeramente distinto para la raíz */
+        border-bottom: 1px solid var(--border-color); 
+        background-color: var(--bg-root); 
     }
-    
     .ahat-directori-arrel:last-child {
-        border-bottom: none; /* Quitamos la línea al último elemento */
+        border-bottom: none;
     }
 
     /* Cada fila (carpeta o documento) */
     .ahat-tree-row {
         display: flex;
         align-items: center;
-        padding: 6px 10px; /* Un poco más de respiro vertical */
+        padding: 8px 12px; 
         cursor: pointer;
         text-decoration: none !important;
         color: inherit;
         user-select: none;
-        transition: background-color 0.15s ease;
+        transition: background-color var(--transition-speed) ease, padding-left var(--transition-speed) ease;
+        border-radius: 4px; /* Suave en el interior */
+        margin: 2px 4px;
     }
 
-    /* Hover */
-    .ahat-tree-row:hover {
-        background-color: #eaf1f8;
+    /* Hover & Focus */
+    .ahat-tree-row:hover, .ahat-tree-row:focus-visible {
+        background-color: var(--bg-hover);
+        outline: none;
     }
 
     /* Enlaces de documentos */
     a.ahat-tree-row {
-        color: #2c3e50;
-        background-color: #fff; /* Las sub-ramas tienen fondo blanco */
-        border-bottom: 1px solid #f7f7f7; /* Micro-línea entre documentos */
-    }
-    a.ahat-tree-row:last-child {
-        border-bottom: none;
+        color: var(--text-main);
+        background-color: transparent;
     }
     a.ahat-tree-row:hover {
-        color: #0056b3;
+        color: #2980b9;
+        background-color: #ebf5fa;
     }
 
     /* Ocultar la flecha nativa de <details> */
@@ -213,32 +235,35 @@
 
     /* Rotación de la pequeña flecha (caret) */
     .ahat-caret {
-        font-size: 10px;
-        width: 18px;
-        color: #888;
-        transition: transform 0.1s ease;
+        font-size: 11px;
+        width: 20px;
+        color: #a6b0b3;
+        transition: transform 0.25s cubic-bezier(0.4, 0, 0.2, 1);
         display: inline-block;
         text-align: center;
     }
     .ahat-tree-node[open] > summary .ahat-caret {
         transform: rotate(90deg);
+        color: var(--text-main);
     }
 
     /* Espaciador para alineación */
     .ahat-caret-placeholder {
-        width: 18px;
+        width: 20px;
         display: inline-block;
+        flex-shrink: 0;
     }
 
     /* Iconos */
     .ahat-icon {
-        margin-right: 8px;
-        font-size: 15px;
+        margin-right: 10px;
+        font-size: 16px;
+        flex-shrink: 0;
     }
-    .ahat-color-carpeta { color: #dcb143; } 
-    .ahat-color-doc { color: #8a959e; }     
-    .ahat-color-privat { color: #e74c3c; }  
-    .ahat-color-buit { color: #bdc3c7; }    
+    .ahat-color-carpeta { color: var(--color-folder); } 
+    .ahat-color-doc { color: var(--color-doc); }    
+    .ahat-color-privat { color: var(--color-private); }  
+    .ahat-color-buit { color: var(--color-empty); }    
 
     /* Textos y etiquetas */
     .ahat-label {
@@ -246,35 +271,57 @@
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
+        padding-right: 10px;
     }
 
     .font-weight-bold {
         font-weight: 600;
-        color: #222;
+        color: #34495e;
     }
 
     .ahat-disabled {
-        color: #888;
+        color: var(--text-muted);
     }
 
-    /* Contador */
+    /* Contadores y Badges (Estilo Píldora) */
     .ahat-tag {
         font-size: 11px;
-        background: #e4e8ec;
-        color: #555;
-        padding: 2px 6px;
-        border-radius: 10px;
-        margin-left: 10px;
+        font-weight: 600;
+        padding: 3px 8px;
+        border-radius: 12px;
+        margin-left: auto; /* Empuja el badge a la derecha */
         white-space: nowrap;
+        flex-shrink: 0;
     }
+    .ahat-badge-info { background: #e1f0fa; color: #2980b9; }
+    .ahat-badge-danger { background: #fdeaea; color: #e74c3c; }
+    .ahat-badge-muted { background: #f0f3f4; color: #7f8c8d; }
 
     /* La rama del árbol (Subcarpetas y documentos) */
     .ahat-tree-branch {
         margin-left: 22px; 
-        padding-left: 8px;
-        border-left: 1px dotted #bbb; /* Línea de guía visual punteada */
-        margin-top: 0;
-        margin-bottom: 8px;
-        background-color: #fff; /* Asegura que el interior del árbol sea blanco */
+        padding-left: 6px;
+        border-left: 1px solid #dfe6e9; /* Línea sólida sutil en lugar de punteada */
+        margin-top: 2px;
+        margin-bottom: 6px;
+        /* Animación suave de aparición */
+        animation: ahat-fade-in 0.3s ease-in-out;
+    }
+
+    @keyframes ahat-fade-in {
+        from { opacity: 0; transform: translateY(-4px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* Estado vacío si no hay colecciones */
+    .ahat-empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: var(--text-muted);
+    }
+    .ahat-empty-state .glyphicon {
+        font-size: 32px;
+        color: var(--color-empty);
+        margin-bottom: 10px;
     }
 </style>
